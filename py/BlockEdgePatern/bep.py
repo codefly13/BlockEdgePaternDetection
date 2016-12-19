@@ -95,6 +95,24 @@ def my_edge_measure2_dct(img, gamma):
     return [thetaNE, theta0, theta45, theta90, theta135]
 
 
+def my_edge_measure3_dct(img, gamma):
+    # print(img, "\n\n")
+    img = img.astype(np.float32)
+    roi_dct = cv.dct(img)
+    # print(roi_dct, "\n")
+    theta0 = abs(roi_dct[1, 0]) / 4
+    theta90 = abs(roi_dct[0, 1]) / 4
+    theta45 = 1/6*max(abs(roi_dct[1, 0]+roi_dct[0, 1]+roi_dct[1, 1]), abs(roi_dct[1, 1]-roi_dct[0, 1]-roi_dct[1, 0]))
+    theta135 = 1/6*max(abs(roi_dct[1, 0]-roi_dct[0, 1]-roi_dct[1, 1]), abs(roi_dct[0, 1]-roi_dct[1, 0]-roi_dct[1, 1]))
+
+    # thetaNE = math.e**(-roi_dct[1, 1]/4)*gamma
+    thetaNE = (1.5 - 1.0 / (1 + math.e ** (-roi_dct[1, 1]/4))) * gamma
+
+    # print([thetaNE, theta0, theta45, theta90, theta135])
+    return [thetaNE, theta0, theta45, theta90, theta135]
+
+
+
 edge_gray = 180
 gamma = 25
 
@@ -143,13 +161,14 @@ cv.imshow("E90", E90)
 cv.imshow("E135", E135)
 
 
-# im = cv.imread('Lena_512512.bmp')
-im = cv.imread('baocai.jpg')
+im = cv.imread('Lena_512512.bmp')
+# im = cv.imread('baocai.jpg')
 im = cv.cvtColor(im, cv.COLOR_RGB2GRAY)
 cv.imshow("src", im)
 im_bep = np.zeros(im.shape, dtype=np.uint8)
 im_bep2 = np.zeros(im.shape, dtype=np.uint8)
 im_bep3 = np.zeros(im.shape, dtype=np.uint8)
+im_bep4 = np.zeros(im.shape, dtype=np.uint8)
 
 for i in range(im.shape[0]//8):
     for j in range(im.shape[1]//8):
@@ -157,7 +176,8 @@ for i in range(im.shape[0]//8):
         # print(roi, '\n')
         edge_value = edge_measure(roi, gamma=20)
         # edge_value2 = edge_measure_dct(roi, gamma=18)
-        edge_value3 = my_edge_measure2_dct(roi, gamma=45)
+        edge_value3 = my_edge_measure2_dct(roi, gamma=10)
+        edge_value4 = my_edge_measure3_dct(roi, gamma=10)
         # print(edge_value, '\n')
         # print(edge_value2, '\n')
         # print(edge_value3, '\n')
@@ -165,10 +185,12 @@ for i in range(im.shape[0]//8):
         im_bep[i * 8:i * 8 + 8, j * 8:j * 8 + 8] = edge_patern[np.argmax(edge_value)]
         # im_bep2[i * 8:i * 8 + 8, j * 8:j * 8 + 8] = edge_patern[np.argmax(edge_value2)]
         im_bep3[i * 8:i * 8 + 8, j * 8:j * 8 + 8] = edge_patern[np.argmax(edge_value3)]
+        im_bep4[i * 8:i * 8 + 8, j * 8:j * 8 + 8] = edge_patern[np.argmax(edge_value4)]
         # cv.imshow("bep", im_bep)
         # cv.imshow("bep2", im_bep2)
         # cv.waitKey(0)
 cv.imshow("bep", im_bep)
 # cv.imshow("bep2", im_bep2)
 cv.imshow("bep3", im_bep3)
+cv.imshow("bep4", im_bep4)
 cv.waitKey(0)
