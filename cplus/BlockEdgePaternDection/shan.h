@@ -17,13 +17,15 @@ double Entropy(Mat img)
   temp[i] = 0.0;
  }
  
+  Mat_<uchar> t = img;
+
  // 计算每个像素的累积值
  for(int m=0;m<img.rows;m++)
  {// 有效访问行列的方式
-  const uchar* t = img.ptr<uchar>(m);
+  
   for(int n=0;n<img.cols;n++)
   {
-   int i = t[n];
+   int i = t(m,n);
    temp[i] = temp[i]+1;
   }
  }

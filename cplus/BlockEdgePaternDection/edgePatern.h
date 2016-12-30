@@ -9,8 +9,7 @@ void gen_edgePatern(Mat ** &ep)
 {
 	ep = new Mat*[5];
 
-	uchar edge_gray = 180;
-	float gamma = 25;
+	uchar edge_gray = 0;
 
 	Mat *NE = new Mat(8, 8, CV_8UC1);
 	Mat_<uchar> &NE_ = (Mat_<uchar>&)(*NE);
